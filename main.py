@@ -1,9 +1,6 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
-from keep_alive import keep_alive
 
-# فعال نگه داشتن ربات در Replit
-keep_alive()
 
 # توکن ربات (جایگزین شده)
 TOKEN = '7667773860:AAFxh_ISGVUTK6xyCNjt-hTRCrC6HK-aHeo'
