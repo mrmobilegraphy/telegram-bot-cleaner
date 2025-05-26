@@ -8,7 +8,7 @@ from keep_alive import keep_alive
 keep_alive()
 
 # توکن ربات
-TOKEN = '7667773860:AAFxh_ISGVUTK6xyCNjt-hTRCrC6HK-aHeo'
+TOKEN = '7667773860:AAEetZ2E-slC8GN3cwJI60rI1P4CgWo27V0'
 
 # لیست کلمات ممنوعه
 banned_words = [
