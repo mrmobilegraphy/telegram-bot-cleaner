@@ -4,6 +4,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filte
 from telegram.error import BadRequest
 from keep_alive import keep_alive
 
+
 # فعال نگه داشتن سرور (برای Railway)
 keep_alive()
 
