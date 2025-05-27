@@ -1,96 +1,69 @@
-
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 from telegram.error import BadRequest
 from keep_alive import keep_alive
 
-
-# فعال نگه داشتن سرور (برای Railway)
+# فعال‌سازی برای Railway
 keep_alive()
 
-# توکن ربات
+# توکن ربات (جایگزین شده)
 TOKEN = '7667773860:AAEetZ2E-slC8GN3cwJI60rI1P4CgWo27V0'
 
-# لیست کلمات ممنوعه
+# لیست کلمات توهین‌آمیز
 banned_words = [
-    'نفهم', 'بی‌ادب', 'احمق', 'خر', 'کثافت', 'پفیوز', 'جاکش', 'جنده',
-    'بی‌شعور', 'بی شعور', 'گاو', 'عوضی', 'بیشعور',
-    'کونی', 'حرومزاده', 'لعنتی', 'بی‌تربیت',
-    'کصشر', 'چرت نگو', 'زر نزن', 'زرزر', 'خفه شو', 'دهنتو ببند', 'پدرسگ',
-    'برو بمیر', 'درک نداری', 'خنگ', 'نکبت', 'خر فهم', 'ننه مرده', 'خایه', 'تخم',
-    'تُف', 'چوس', 'عن', 'کوفت', 'زهرمار', 'زرشک', 'سوسک', 'بدردنخور',
-    'کیر', 'کص', 'کصافط', 'گوه', 'عنتر', 'کون', 'کونیه', 'اوباش',
-    'بی‌اصل‌ونسب', 'حمال', 'چلاق', 'شل مغز', 'ترکیده', 'هیز', 'رو مخی'
+    'نفهم', 'احمق', 'احمقی', 'خر', 'بیشعور', 'بی‌شعور', 'کثافت', 'گاو', 'عوضی', 'پدرسگ',
+    'ریدم', 'ریدم‌تو', 'کونی', 'بی‌ناموس', 'جنده', 'کسخل', 'پدرسگ', 'کسکش',
+    'کثیف', 'گوهی', 'کونی', 'کونی‌تر', 'عنتر', 'ننه‌ات', 'ننتو', 'خاک‌برسر',
+    'تخم‌حروم', 'عوضیا', 'عنتر', 'پفیوز', 'بی‌ناموس', 'فاک', 'fuck',
+    'کسافت', 'گوه', 'ریدم', 'چرت', 'بی‌سواد', 'نفهم‌ها', 'کس‌ننه‌ت', 'بی‌ادب',
+    'حیوان', 'خراب', 'یابو', 'یابوی', 'نجس', 'سوسک', 'گوزو', 'شاشو'
 ]
 
-# جمله‌های توهین‌آمیز
+# لیست جملات توهین‌آمیز
 banned_phrases = [
-    'شعور نداری', 'بی‌شعوری در حد تیم ملی', 'تو آدم نیستی', 'برو بمیر', 'خفه شو',
-    'دهنتو ببند', 'عقل نداری', 'برات متاسفم', 'تو نمی‌فهمی', 'تو کی هستی که حرف بزنی',
-    'زر نزن', 'حرف مفت نزن', 'چقدر خری تو', 'چه پخی هستی', 'تو آدم نمی‌شی', 'برو گم شو',
-    'خیلی عقده‌ای هستی', 'تو زیادی حرف می‌زنی', 'تو چقدر بدبختی', 'من جات بودم خجالت می‌کشیدم',
-    'حرفت بوی حسادت می‌ده', 'تو مریضی', 'بهت نمیاد آدم باشی', 'تو ادب نداری',
-    'سطحت پایینه', 'آخه تو چی می‌فهمی', 'دهنت بوی گه می‌ده', 'با تو نیستم خفه شو', 'زر مفت نزن',
-    'خایه', 'خایه‌مالی', 'گوه نخور', 'گاییدم', 'جنده', 'کونی', 'حرومزاده'
+    'بخور بمیر', 'تخم حرومی', 'خاک‌بر سرت', 'آدم نیستی', 'کونی مادر', 'تو هیچی نیستی',
+    'ریدم تو وجودت', 'عقل نداری', 'اگه آدم بودی', 'بیشعور بیشعور', 'تف به روت', 'توی بیشعور',
+    'خر فرضت کردم', 'ننتو باید', 'چته تو', 'ساکت شو', 'حرومزاده', 'بی‌شعور', 'بی‌تربیت', 'دهنتو ببند',
+    'گوه نخور', 'پفیوز', 'بی‌شخصیت', 'کس‌ننه‌ت', 'کس‌کش', 'لعنتی', 'پدر سگ', 'عوضی'
+]
 
-        'گوه', 'گوه خوردی', 'گوه نخور', 'خفه شو', 'برو بمیر', 'زر نزن', 'زر مفت نزن',
-        'دهنتو ببند', 'دهنت بوی گه می‌ده', 'عقل نداری', 'بیشعور', 'بی‌شعوری در حد تیم ملی',
-        'چقدر خری', 'خیلی خری', 'تو خیلی خری', 'خری تو', 'خر خودتی', 'خره', 'الاغ',
-        'حیوانی', 'کثافت', 'لعنتی', 'پفیوز', 'مریضی', 'حالم ازت به‌هم می‌خوره',
-        'تو آدم نمی‌شی', 'تو مریضی', 'تو ادب نداری', 'تو نمی‌فهمی', 'تو چی حالیته',
-        'تو کی هستی که حرف بزنی', 'حرفت بوی حسادت می‌ده', 'ساکت شو', 'خفه خون بگیر', 'ساک بزن',
-
-        # الفاظ جنسی رکیک
-        'کونی', 'جنده', 'حرومزاده', 'تخم', 'خایه', 'خایه‌مال', 'کیر', 'کیرم', 'کیرت',
-        'کون', 'کونت', 'گاییدم', 'سکس', 'چاک بده', 'بدم میاد ازت', 'برات متاسفم',
-
-        # ترکیبات تحقیرآمیز یا طعنه‌آمیز
-        'آدم نیستی', 'بی‌تربیت', 'بی‌ارزش', 'تو هیچ‌چی نیستی', 'تو پخی نیستی', 'چه پخی هستی',
-        'تو زیادی حرف می‌زنی', 'خجالت نمی‌کشی', 'من جات بودم خجالت می‌کشیدم',
-        'سطحت پایینه', 'آخه تو چی می‌فهمی', 'برو گم شو', 'بهت نمیاد آدم باشی',
-        'تو عقده‌ای هستی', 'خیلی عقده‌ای هستی', 'بدبختی', 'تو چقدر بدبختی', 'خاک بر سرت',
-
-        # مخفف‌ها و ایموجی‌نویسی فحش
-        'goh', 'koskhol', 'koskholi', 'koskholha', 'kir', 'koni', 'jende', 'khaye', 'khar',
-        'shit', 'fuck', 'fuck you', 'saket', 'kirm', 'konde', 'haroomzadeh', 'haye',
-
-        # فحش‌های انگلیسی رایج که در فارسی استفاده می‌شن
-        'stfu', 'bitch', 'asshole', 'dumb', 'idiot', 'retard', 'loser', 'son of a bitch'
-    ]
-
-# هندلر اصلی پاک‌کننده پیام‌های بد
+# حذف پیام‌های توهین‌آمیز
 async def delete_bad_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message:
         text = update.message.text.lower()
         user = update.message.from_user.full_name
-        chat_id = update.effective_chat.id
+        chat_id = update.message.chat_id
 
-        print(f"📩 دریافت پیام: {text} از طرف {user} (chat_id: {chat_id})")
+        for word in banned_words:
+            if word in text:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=update.message.message_id)
+                    print(f"❌ پیام حاوی کلمه توهین‌آمیز حذف شد از طرف {user}")
+                    return
+                except BadRequest as e:
+                    print(f"خطا در حذف پیام: {e}")
 
-        # بررسی کلمات ممنوعه
-        if any(bad_word in text for bad_word in banned_words + banned_phrases):
-            await update.message.delete()
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=f"⚠️ {user} عزیز، لطفاً رعایت ادب رو داشته باشید. پیام شما حذف شد."
-            )
-            print(f"🚨 پیام حاوی توهین حذف شد: {text}")
-        else:
-            print("✅ پیام مشکلی نداشت.")
+        for phrase in banned_phrases:
+            if phrase in text:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=update.message.message_id)
+                    print(f"❌ پیام حاوی جمله توهین‌آمیز حذف شد از طرف {user}")
+                    return
+                except BadRequest as e:
+                    print(f"خطا در حذف پیام: {e}")
 
-# هندلر برای لاگ‌کردن خطاها
-async def handle_errors(update: object, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        raise context.error
-    except BadRequest as e:
-        print(f"❌ BadRequest: {e}")
-    except Exception as e:
-        print(f"❗ Exception: {e}")
+# اجرای ربات
+async def main():
+    app = ApplicationBuilder().token(TOKEN).build()
 
-# اجرای اپلیکیشن
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, delete_bad_messages))
-app.add_error_handler(handle_errors)
+    # 🚨 حذف Webhook برای جلوگیری از Conflict
+    await app.bot.delete_webhook(drop_pending_updates=True)
 
-print("🤖 ربات با موفقیت راه‌اندازی شد و آماده دریافت پیام است.")
-app.run_polling()
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), delete_bad_messages))
+    print("🤖 ربات با موفقیت راه‌اندازی شد و آماده دریافت پیام است.")
+    await app.run_polling()
+
+# اجرای main
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
