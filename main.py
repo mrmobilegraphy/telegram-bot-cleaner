@@ -1,6 +1,9 @@
+
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 from telegram.error import BadRequest
+from keep_alive import keep_alive
+keep_alive()
 
 # توکن ربات
 TOKEN = '7667773860:AAEetZ2E-slC8GN3cwJI60rI1P4CgWo27V0'
