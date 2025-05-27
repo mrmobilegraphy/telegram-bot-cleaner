@@ -1,69 +1,62 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 from telegram.error import BadRequest
-from keep_alive import keep_alive
+from keep_alive import keep_alive  # اگر از Railway استفاده می‌کنید، این را حفظ کنید
 
-# فعال‌سازی برای Railway
 keep_alive()
 
-# توکن ربات (جایگزین شده)
+# توکن ربات (حتماً توکن صحیح جایگزین شود)
 TOKEN = '7667773860:AAEetZ2E-slC8GN3cwJI60rI1P4CgWo27V0'
 
-# لیست کلمات توهین‌آمیز
+# کلمات توهین‌آمیز
 banned_words = [
-    'نفهم', 'احمق', 'احمقی', 'خر', 'بیشعور', 'بی‌شعور', 'کثافت', 'گاو', 'عوضی', 'پدرسگ',
-    'ریدم', 'ریدم‌تو', 'کونی', 'بی‌ناموس', 'جنده', 'کسخل', 'پدرسگ', 'کسکش',
-    'کثیف', 'گوهی', 'کونی', 'کونی‌تر', 'عنتر', 'ننه‌ات', 'ننتو', 'خاک‌برسر',
-    'تخم‌حروم', 'عوضیا', 'عنتر', 'پفیوز', 'بی‌ناموس', 'فاک', 'fuck',
-    'کسافت', 'گوه', 'ریدم', 'چرت', 'بی‌سواد', 'نفهم‌ها', 'کس‌ننه‌ت', 'بی‌ادب',
-    'حیوان', 'خراب', 'یابو', 'یابوی', 'نجس', 'سوسک', 'گوزو', 'شاشو'
+    'نفهم', 'احمق', 'احمق!', 'بی‌ادب', 'بیشعور', 'خر', 'گاو', 'کثافت', 'بی‌شعور', 'عوضی',
+    'خاک‌برسر', 'لعنتی', 'کونی', 'ناموس‌فروش', 'نامرد', 'بی‌ناموس', 'نفرین', 'دیوث', 'حرومزاده',
+    'حرومزاده‌ای', 'دلقک', 'کرم', 'گوه', 'جاکش', 'مادرجنده', 'کسخل', 'جنده', 'کیر', 'کونی', 'کصکش',
+    'کسکش', 'خر', 'کص', 'کثیف', 'بی‌همه‌چیز'
 ]
 
-# لیست جملات توهین‌آمیز
+# جملات توهین‌آمیز
 banned_phrases = [
-    'بخور بمیر', 'تخم حرومی', 'خاک‌بر سرت', 'آدم نیستی', 'کونی مادر', 'تو هیچی نیستی',
-    'ریدم تو وجودت', 'عقل نداری', 'اگه آدم بودی', 'بیشعور بیشعور', 'تف به روت', 'توی بیشعور',
-    'خر فرضت کردم', 'ننتو باید', 'چته تو', 'ساکت شو', 'حرومزاده', 'بی‌شعور', 'بی‌تربیت', 'دهنتو ببند',
-    'گوه نخور', 'پفیوز', 'بی‌شخصیت', 'کس‌ننه‌ت', 'کس‌کش', 'لعنتی', 'پدر سگ', 'عوضی'
+    'بیشعور هستی', 'خیلی بیشعوری', 'تو آدم نیستی', 'برو بمیر', 'دهن‌تو ببند', 'خفه شو',
+    'تو عقل نداری', 'برای تو متاسفم', 'خیلی عقده‌ای هستی', 'چه پخی هستی', 'تو زیادی حرف می‌زنی',
+    'چقدر بدبختی تو', 'تو اصلاً شعور نداری', 'اگه من جات بودم خجالت می‌کشیدم', 'زر نزن',
+    'حرف مفت نزن', 'خیلی خری', 'تو چقدر پستی', 'چه آدم عوضی‌ای هستی', 'برو گم شو',
+    'تو نمی‌فهمی', 'باید بری دکتر روانی', 'حالم ازت به‌هم می‌خوره', 'تو یه آشغال به تمام معنا هستی',
+    'خفه شو لطفاً', 'هیچی نمی‌فهمی', 'من جات بودم زنده نمی‌موندم', 'بیشعوری در حد تیم ملی'
 ]
 
-# حذف پیام‌های توهین‌آمیز
+# اجرای چک پیام‌ها و حذف در صورت نیاز
 async def delete_bad_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message:
         text = update.message.text.lower()
         user = update.message.from_user.full_name
-        chat_id = update.message.chat_id
 
+        # بررسی کلمات ممنوعه
         for word in banned_words:
             if word in text:
                 try:
-                    await context.bot.delete_message(chat_id=chat_id, message_id=update.message.message_id)
-                    print(f"❌ پیام حاوی کلمه توهین‌آمیز حذف شد از طرف {user}")
-                    return
+                    await update.message.delete()
+                    print(f"❌ پیام حاوی کلمه ممنوعه: '{word}' توسط {user} حذف شد.")
                 except BadRequest as e:
-                    print(f"خطا در حذف پیام: {e}")
+                    print(f"⚠️ خطا در حذف پیام: {e}")
+                return
 
+        # بررسی عبارات ممنوعه
         for phrase in banned_phrases:
             if phrase in text:
                 try:
-                    await context.bot.delete_message(chat_id=chat_id, message_id=update.message.message_id)
-                    print(f"❌ پیام حاوی جمله توهین‌آمیز حذف شد از طرف {user}")
-                    return
+                    await update.message.delete()
+                    print(f"❌ پیام حاوی جمله ممنوعه: '{phrase}' توسط {user} حذف شد.")
                 except BadRequest as e:
-                    print(f"خطا در حذف پیام: {e}")
+                    print(f"⚠️ خطا در حذف پیام: {e}")
+                return
 
-# اجرای ربات
-async def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+        print(f"✅ پیام بدون مشکل: {text}")
 
-    # 🚨 حذف Webhook برای جلوگیری از Conflict
-    await app.bot.delete_webhook(drop_pending_updates=True)
-
-    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), delete_bad_messages))
-    print("🤖 ربات با موفقیت راه‌اندازی شد و آماده دریافت پیام است.")
-    await app.run_polling()
-
-# اجرای main
+# راه‌اندازی اپلیکیشن و ثبت هندلر
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, delete_bad_messages))
+    print("🤖 ربات با موفقیت راه‌اندازی شد و آماده دریافت پیام است.")
+    app.run_polling()
